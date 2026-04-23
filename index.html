@@ -1,0 +1,3205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniAI Hub - Learn AI. Earn Money. Grow as a Student.</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        :root {
+            --primary: #0A192F;
+            --secondary: #00C9A7;
+            --accent: #FFD700;
+            --dark: #020c1b;
+            --light: #f8fafc;
+            --gray: #8892b0;
+            --light-gray: #e2e8f0;
+            --glass: rgba(10, 25, 47, 0.85);
+            --glass-border: rgba(0, 201, 167, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--dark);
+            color: #ccd6f6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* Loading Screen */
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        #loading-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loader-container {
+            text-align: center;
+        }
+
+        .loader-logo {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--secondary);
+            margin-bottom: 20px;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        .loader-bar {
+            width: 200px;
+            height: 4px;
+            background: rgba(0, 201, 167, 0.2);
+            border-radius: 2px;
+            overflow: hidden;
+            margin: 0 auto;
+        }
+
+        .loader-bar-inner {
+            height: 100%;
+            background: var(--secondary);
+            border-radius: 2px;
+            animation: loadBar 2s ease-in-out infinite;
+        }
+
+        @keyframes loadBar {
+            0% { width: 0%; margin-left: 0; }
+            50% { width: 100%; margin-left: 0; }
+            100% { width: 0%; margin-left: 100%; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(0.98); }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--dark); }
+        ::-webkit-scrollbar-thumb { background: var(--secondary); border-radius: 4px; }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-60px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(60px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(0, 201, 167, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(0, 201, 167, 0.6); }
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .animate-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .delay-1 { transition-delay: 0.1s; }
+        .delay-2 { transition-delay: 0.2s; }
+        .delay-3 { transition-delay: 0.3s; }
+        .delay-4 { transition-delay: 0.4s; }
+        .delay-5 { transition-delay: 0.5s; }
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 1rem 2rem;
+            background: transparent;
+            transition: all 0.4s ease;
+        }
+
+        .navbar.scrolled {
+            background: rgba(10, 25, 47, 0.95);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+            padding: 0.8rem 2rem;
+        }
+
+        .navbar-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--secondary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--secondary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 1.1rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #ccd6f6;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--secondary);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--secondary);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-cta {
+            background: var(--secondary);
+            color: var(--primary) !important;
+            padding: 0.6rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600 !important;
+            transition: all 0.3s ease;
+        }
+
+        .nav-cta:hover {
+            background: #00b396;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 201, 167, 0.4);
+        }
+
+        .nav-cta::after { display: none !important; }
+
+        .mobile-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Mobile Menu */
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 80%;
+            max-width: 350px;
+            height: 100vh;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            z-index: 1001;
+            padding: 80px 2rem 2rem;
+            transition: right 0.4s ease;
+            border-left: 1px solid var(--glass-border);
+        }
+
+        .mobile-menu.open {
+            right: 0;
+        }
+
+        .mobile-menu-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .mobile-menu-overlay.open {
+            display: block;
+            opacity: 1;
+        }
+
+        .mobile-menu-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: var(--secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .mobile-menu ul {
+            list-style: none;
+        }
+
+        .mobile-menu li {
+            margin-bottom: 1.5rem;
+        }
+
+        .mobile-menu a {
+            color: #ccd6f6;
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 500;
+            display: block;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .mobile-menu a:hover {
+            color: var(--secondary);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            padding: 120px 2rem 80px;
+        }
+
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        .hero-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 201, 167, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 201, 167, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(60px, 60px); }
+        }
+
+        .hero-glow {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0, 201, 167, 0.15) 0%, transparent 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        .hero-particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--secondary);
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: floatParticle 15s infinite;
+        }
+
+        @keyframes floatParticle {
+            0%, 100% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.6; }
+            100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
+        }
+
+        .hero-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            width: 100%;
+        }
+
+        .hero-text h1 {
+            font-size: clamp(2.5rem, 5vw, 4.5rem);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            color: #e6f1ff;
+        }
+
+        .hero-text h1 span {
+            color: var(--secondary);
+            position: relative;
+        }
+
+        .hero-text h1 span::after {
+            content: '';
+            position: absolute;
+            bottom: 5px;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background: rgba(0, 201, 167, 0.3);
+            z-index: -1;
+            border-radius: 2px;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--gray);
+            margin-bottom: 2rem;
+            max-width: 500px;
+            line-height: 1.7;
+        }
+
+        .hero-badges {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+            flex-wrap: wrap;
+        }
+
+        .hero-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(0, 201, 167, 0.1);
+            border: 1px solid rgba(0, 201, 167, 0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            color: var(--secondary);
+        }
+
+        .hero-cta-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--secondary);
+            color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background: #00b396;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 201, 167, 0.4);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--secondary);
+            border: 2px solid var(--secondary);
+        }
+
+        .btn-outline:hover {
+            background: rgba(0, 201, 167, 0.1);
+            transform: translateY(-3px);
+        }
+
+        .btn-accent {
+            background: var(--accent);
+            color: var(--primary);
+        }
+
+        .btn-accent:hover {
+            background: #e6c200;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
+        }
+
+        .hero-visual {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .hero-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2rem;
+            width: 100%;
+            max-width: 450px;
+            animation: float 6s ease-in-out infinite;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+        }
+
+        .hero-card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-card-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .hero-card-info h4 {
+            color: #e6f1ff;
+            font-size: 1rem;
+        }
+
+        .hero-card-info p {
+            color: var(--gray);
+            font-size: 0.8rem;
+        }
+
+        .hero-card-badge {
+            display: inline-block;
+            background: rgba(0, 201, 167, 0.2);
+            color: var(--secondary);
+            padding: 0.3rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .hero-card-task {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 0.8rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .hero-card-task-info h5 {
+            color: #e6f1ff;
+            font-size: 0.9rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .hero-card-task-info p {
+            color: var(--gray);
+            font-size: 0.75rem;
+        }
+
+        .hero-card-price {
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .hero-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .hero-stat h3 {
+            color: var(--secondary);
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+
+        .hero-stat p {
+            color: var(--gray);
+            font-size: 0.75rem;
+        }
+
+        /* Section Styles */
+        .section {
+            padding: 100px 2rem;
+            position: relative;
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto 4rem;
+        }
+
+        .section-label {
+            display: inline-block;
+            color: var(--secondary);
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 1rem;
+            background: rgba(0, 201, 167, 0.1);
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+        }
+
+        .section-title {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 800;
+            color: #e6f1ff;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .section-desc {
+            color: var(--gray);
+            font-size: 1.1rem;
+            line-height: 1.7;
+        }
+
+        /* Features Section */
+        .features-grid {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2.5rem;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--secondary);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease;
+        }
+
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            border-color: rgba(0, 201, 167, 0.4);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(0, 201, 167, 0.1);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--secondary);
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover .feature-icon {
+            background: var(--secondary);
+            color: var(--primary);
+            transform: scale(1.1);
+        }
+
+        .feature-card h3 {
+            color: #e6f1ff;
+            font-size: 1.3rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .feature-card p {
+            color: var(--gray);
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        /* How It Works */
+        .how-it-works {
+            background: rgba(10, 25, 47, 0.5);
+        }
+
+        .steps-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .steps-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 3rem;
+        }
+
+        .step-tab {
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            border: 2px solid rgba(0, 201, 167, 0.3);
+            background: transparent;
+            color: #ccd6f6;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .step-tab.active {
+            background: var(--secondary);
+            color: var(--primary);
+            border-color: var(--secondary);
+        }
+
+        .step-tab:hover {
+            border-color: var(--secondary);
+            color: var(--secondary);
+        }
+
+        .step-tab.active:hover {
+            color: var(--primary);
+        }
+
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .step-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2.5rem;
+            text-align: center;
+            position: relative;
+            transition: all 0.4s ease;
+        }
+
+        .step-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .step-number {
+            width: 60px;
+            height: 60px;
+            background: var(--secondary);
+            color: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin: 0 auto 1.5rem;
+            position: relative;
+        }
+
+        .step-number::after {
+            content: '';
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border: 2px dashed rgba(0, 201, 167, 0.3);
+            border-radius: 50%;
+            animation: spin 20s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .step-card h3 {
+            color: #e6f1ff;
+            font-size: 1.3rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .step-card p {
+            color: var(--gray);
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        /* Testimonials */
+        .testimonials-grid {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .testimonial-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2.5rem;
+            transition: all 0.4s ease;
+        }
+
+        .testimonial-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .testimonial-stars {
+            color: var(--accent);
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .testimonial-text {
+            color: #ccd6f6;
+            font-size: 1rem;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+            font-style: italic;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .testimonial-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .testimonial-info h4 {
+            color: #e6f1ff;
+            font-size: 1rem;
+        }
+
+        .testimonial-info p {
+            color: var(--gray);
+            font-size: 0.85rem;
+        }
+
+        /* CTA Banner */
+        .cta-banner {
+            padding: 80px 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-banner-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--secondary);
+            opacity: 0.1;
+        }
+
+        .cta-banner-content {
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cta-banner h2 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 800;
+            color: #e6f1ff;
+            margin-bottom: 1rem;
+        }
+
+        .cta-banner p {
+            color: var(--gray);
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Dashboard Styles */
+        .dashboard {
+            min-height: 100vh;
+            padding-top: 80px;
+            background: var(--dark);
+        }
+
+        .dashboard-header {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 2rem;
+        }
+
+        .dashboard-header-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .dashboard-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #e6f1ff;
+        }
+
+        .dashboard-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .dashboard-body {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 2rem;
+        }
+
+        .dashboard-sidebar {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 1.5rem;
+            height: fit-content;
+        }
+
+        .dashboard-profile {
+            text-align: center;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 1.5rem;
+        }
+
+        .dashboard-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0 auto 1rem;
+        }
+
+        .dashboard-profile h3 {
+            color: #e6f1ff;
+            font-size: 1.2rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .dashboard-profile p {
+            color: var(--gray);
+            font-size: 0.85rem;
+        }
+
+        .dashboard-menu {
+            list-style: none;
+        }
+
+        .dashboard-menu li {
+            margin-bottom: 0.5rem;
+        }
+
+        .dashboard-menu a {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.8rem 1rem;
+            border-radius: 10px;
+            color: #ccd6f6;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .dashboard-menu a:hover,
+        .dashboard-menu a.active {
+            background: rgba(0, 201, 167, 0.1);
+            color: var(--secondary);
+        }
+
+        .dashboard-main {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .dashboard-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2rem;
+        }
+
+        .dashboard-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .dashboard-card-header h3 {
+            color: #e6f1ff;
+            font-size: 1.2rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(0, 201, 167, 0.4);
+        }
+
+        .stat-card-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-card-icon.green { background: rgba(0, 201, 167, 0.15); color: var(--secondary); }
+        .stat-card-icon.gold { background: rgba(255, 215, 0, 0.15); color: var(--accent); }
+        .stat-card-icon.blue { background: rgba(100, 149, 237, 0.15); color: #6495ED; }
+
+        .stat-card h4 {
+            color: #e6f1ff;
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-card p {
+            color: var(--gray);
+            font-size: 0.85rem;
+        }
+
+        /* Badges */
+        .badges-grid {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .badge-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(0, 201, 167, 0.1);
+            border: 1px solid rgba(0, 201, 167, 0.3);
+            padding: 0.6rem 1rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            color: var(--secondary);
+            font-weight: 600;
+        }
+
+        .badge-item.gold {
+            background: rgba(255, 215, 0, 0.1);
+            border-color: rgba(255, 215, 0, 0.3);
+            color: var(--accent);
+        }
+
+        /* Task List */
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .task-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .task-item:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(0, 201, 167, 0.2);
+        }
+
+        .task-info h4 {
+            color: #e6f1ff;
+            font-size: 1rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .task-info p {
+            color: var(--gray);
+            font-size: 0.85rem;
+        }
+
+        .task-meta {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .task-price {
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .task-deadline {
+            color: var(--gray);
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .task-status {
+            padding: 0.3rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .task-status.open {
+            background: rgba(0, 201, 167, 0.15);
+            color: var(--secondary);
+        }
+
+        .task-status.in-progress {
+            background: rgba(255, 215, 0, 0.15);
+            color: var(--accent);
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            color: #e6f1ff;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.9rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: #e6f1ff;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(0, 201, 167, 0.1);
+        }
+
+        .form-control::placeholder {
+            color: var(--gray);
+        }
+
+        textarea.form-control {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        select.form-control {
+            cursor: pointer;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .form-error {
+            color: #ff6b6b;
+            font-size: 0.8rem;
+            margin-top: 0.3rem;
+        }
+
+        /* Marketplace */
+        .marketplace-filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 0.6rem 1.2rem;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            color: #ccd6f6;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: var(--secondary);
+            color: var(--primary);
+            border-color: var(--secondary);
+        }
+
+        .marketplace-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .marketplace-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 1.8rem;
+            transition: all 0.4s ease;
+        }
+
+        .marketplace-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            border-color: rgba(0, 201, 167, 0.4);
+        }
+
+        .marketplace-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+
+        .marketplace-card-type {
+            background: rgba(0, 201, 167, 0.15);
+            color: var(--secondary);
+            padding: 0.3rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .marketplace-card-price {
+            color: var(--accent);
+            font-weight: 800;
+            font-size: 1.2rem;
+        }
+
+        .marketplace-card h3 {
+            color: #e6f1ff;
+            font-size: 1.1rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .marketplace-card p {
+            color: var(--gray);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 1.2rem;
+        }
+
+        .marketplace-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .marketplace-card-meta {
+            display: flex;
+            gap: 1rem;
+            color: var(--gray);
+            font-size: 0.8rem;
+        }
+
+        /* Auth Pages */
+        .auth-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--dark);
+        }
+
+        .auth-bg::before {
+            content: '';
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0, 201, 167, 0.1) 0%, transparent 70%);
+            top: -200px;
+            right: -200px;
+        }
+
+        .auth-bg::after {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.05) 0%, transparent 70%);
+            bottom: -100px;
+            left: -100px;
+        }
+
+        .auth-container {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 3rem;
+            width: 100%;
+            max-width: 480px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .auth-header .logo {
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+
+        .auth-header h2 {
+            color: #e6f1ff;
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .auth-header p {
+            color: var(--gray);
+            font-size: 0.95rem;
+        }
+
+        .auth-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.3rem;
+            border-radius: 12px;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 0.7rem;
+            border-radius: 10px;
+            border: none;
+            background: transparent;
+            color: #ccd6f6;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .auth-tab.active {
+            background: var(--secondary);
+            color: var(--primary);
+        }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .auth-footer a {
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .auth-footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* About Page */
+        .about-hero {
+            padding: 140px 2rem 80px;
+            text-align: center;
+        }
+
+        .about-hero h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 900;
+            color: #e6f1ff;
+            margin-bottom: 1rem;
+        }
+
+        .about-hero p {
+            color: var(--gray);
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.8;
+        }
+
+        .about-grid {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .about-image {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+        }
+
+        .about-image-icon {
+            font-size: 8rem;
+            color: var(--secondary);
+            opacity: 0.3;
+        }
+
+        .about-content h2 {
+            color: #e6f1ff;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .about-content p {
+            color: var(--gray);
+            font-size: 1rem;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Contact Page */
+        .contact-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            padding: 0 2rem;
+        }
+
+        .contact-info h2 {
+            color: #e6f1ff;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .contact-info p {
+            color: var(--gray);
+            font-size: 1rem;
+            line-height: 1.8;
+            margin-bottom: 2rem;
+        }
+
+        .contact-details {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .contact-item-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(0, 201, 167, 0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--secondary);
+            font-size: 1.2rem;
+        }
+
+        .contact-item-info h4 {
+            color: #e6f1ff;
+            font-size: 1rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .contact-item-info p {
+            color: var(--gray);
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .social-link {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            background: rgba(0, 201, 167, 0.1);
+            border: 1px solid rgba(0, 201, 167, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--secondary);
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .social-link:hover {
+            background: var(--secondary);
+            color: var(--primary);
+            transform: translateY(-3px);
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(2, 12, 27, 0.95);
+            border-top: 1px solid rgba(0, 201, 167, 0.1);
+            padding: 60px 2rem 30px;
+        }
+
+        .footer-grid {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-brand p {
+            color: var(--gray);
+            font-size: 0.95rem;
+            line-height: 1.7;
+            margin-top: 1rem;
+        }
+
+        .footer-links h4 {
+            color: #e6f1ff;
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-links ul {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-links a {
+            color: var(--gray);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--secondary);
+        }
+
+        .footer-bottom {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .footer-bottom p {
+            color: var(--gray);
+            font-size: 0.85rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .hero-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .hero-subtitle {
+                margin: 0 auto 2rem;
+            }
+
+            .hero-badges {
+                justify-content: center;
+            }
+
+            .hero-cta-group {
+                justify-content: center;
+            }
+
+            .hero-visual {
+                order: -1;
+            }
+
+            .dashboard-body {
+                grid-template-columns: 1fr;
+            }
+
+            .dashboard-sidebar {
+                display: none;
+            }
+
+            .about-grid,
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .mobile-toggle {
+                display: block;
+            }
+
+            .mobile-menu {
+                display: block;
+            }
+
+            .hero {
+                padding: 100px 1.5rem 60px;
+            }
+
+            .section {
+                padding: 60px 1.5rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-bottom {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .testimonials-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Toast Notification */
+        .toast-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .toast {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            color: #e6f1ff;
+            font-size: 0.9rem;
+            animation: slideInRight 0.4s ease;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .toast.success { border-left: 4px solid var(--secondary); }
+        .toast.error { border-left: 4px solid #ff6b6b; }
+        .toast.info { border-left: 4px solid #6495ED; }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.open {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.open .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header h3 {
+            color: #e6f1ff;
+            font-size: 1.3rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--gray);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .modal-close:hover {
+            color: var(--secondary);
+        }
+    </style>
+<base target="_blank">
+</head>
+<body>
+    <div id="loading-screen">
+        <div class="loader-container">
+            <div class="loader-logo">UniAI Hub</div>
+            <div class="loader-bar">
+                <div class="loader-bar-inner"></div>
+            </div>
+        </div>
+    </div>
+    <div id="root"></div>
+    <script type="text/babel">
+
+        function StudentDashboard({ navigate, addToast }) {
+            const [activeTab, setActiveTab] = useState('tasks');
+            const [tasks, setTasks] = useState(TASKS);
+
+            const handleApply = (taskId) => {
+                addToast('Application submitted successfully!', 'success');
+            };
+
+            return (
+                <div className="dashboard">
+                    <div className="dashboard-header">
+                        <div className="dashboard-header-inner">
+                            <h1 className="dashboard-title"><i className="fas fa-user-graduate"></i> Student Dashboard</h1>
+                            <div className="dashboard-actions">
+                                <button className="btn btn-primary" onClick={() => navigate('marketplace')}>
+                                    <i className="fas fa-search"></i> Browse Tasks
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="dashboard-body">
+                        <aside className="dashboard-sidebar">
+                            <div className="dashboard-profile">
+                                <div className="dashboard-avatar">JD</div>
+                                <h3>Janith De Silva</h3>
+                                <p>Computer Science, UOM</p>
+                            </div>
+                            <ul className="dashboard-menu">
+                                <li><a href="#" className={activeTab === 'overview' ? 'active' : ''} onClick={(e) => { e.preventDefault(); setActiveTab('overview'); }}><i className="fas fa-chart-pie"></i> Overview</a></li>
+                                <li><a href="#" className={activeTab === 'tasks' ? 'active' : ''} onClick={(e) => { e.preventDefault(); setActiveTab('tasks'); }}><i className="fas fa-tasks"></i> My Tasks</a></li>
+                                <li><a href="#" className={activeTab === 'earnings' ? 'active' : ''} onClick={(e) => { e.preventDefault(); setActiveTab('earnings'); }}><i className="fas fa-wallet"></i> Earnings</a></li>
+                                <li><a href="#" className={activeTab === 'skills' ? 'active' : ''} onClick={(e) => { e.preventDefault(); setActiveTab('skills'); }}><i className="fas fa-medal"></i> Skills & Badges</a></li>
+                                <li><a href="#" className={activeTab === 'portfolio' ? 'active' : ''} onClick={(e) => { e.preventDefault(); setActiveTab('portfolio'); }}><i className="fas fa-folder-open"></i> Portfolio</a></li>
+                                <li><a href="#" onClick={(e) => { e.preventDefault(); navigate('home'); }}><i className="fas fa-sign-out-alt"></i> Logout</a></li>
+                            </ul>
+                        </aside>
+                        <main className="dashboard-main">
+                            {/* Stats */}
+                            <div className="stats-grid">
+                                <div className="stat-card">
+                                    <div className="stat-card-icon green"><i className="fas fa-wallet"></i></div>
+                                    <h4>Rs. 180,000</h4>
+                                    <p>Total Earnings</p>
+                                </div>
+                                <div className="stat-card">
+                                    <div className="stat-card-icon gold"><i className="fas fa-check-circle"></i></div>
+                                    <h4>12</h4>
+                                    <p>Tasks Completed</p>
+                                </div>
+                                <div className="stat-card">
+                                    <div className="stat-card-icon blue"><i className="fas fa-star"></i></div>
+                                    <h4>4.9</h4>
+                                    <p>Average Rating</p>
+                                </div>
+                            </div>
+
+                            {/* Skills & Badges */}
+                            <div className="dashboard-card">
+                                <div className="dashboard-card-header">
+                                    <h3><i className="fas fa-medal"></i> Skill Badges</h3>
+                                </div>
+                                <div className="badges-grid">
+                                    <div className="badge-item"><i className="fas fa-seedling"></i> AI Beginner</div>
+                                    <div className="badge-item"><i className="fas fa-bullhorn"></i> AI Marketer</div>
+                                    <div className="badge-item gold"><i className="fas fa-crown"></i> AI Pro</div>
+                                    <div className="badge-item"><i className="fas fa-pen"></i> Content Creator</div>
+                                    <div className="badge-item"><i className="fas fa-robot"></i> Chatbot Builder</div>
+                                </div>
+                            </div>
+
+                            {/* Available Tasks */}
+                            <div className="dashboard-card">
+                                <div className="dashboard-card-header">
+                                    <h3><i className="fas fa-tasks"></i> Available Tasks</h3>
+                                    <button className="btn btn-primary" style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }} onClick={() => navigate('marketplace')}>
+                                        View All
+                                    </button>
+                                </div>
+                                <div className="task-list">
+                                    {tasks.slice(0, 4).map(task => (
+                                        <div key={task.id} className="task-item">
+                                            <div className="task-info">
+                                                <h4>{task.title}</h4>
+                                                <p>{task.type} • {task.desc.substring(0, 60)}...</p>
+                                            </div>
+                                            <div className="task-meta">
+                                                <span className="task-price">{task.price}</span>
+                                                <span className="task-deadline"><i className="fas fa-clock"></i> {task.deadline}</span>
+                                                <span className={`task-status ${task.status}`}>{task.status}</span>
+                                                <button className="btn btn-primary" style={{ padding: '0.5rem 1.2rem', fontSize: '0.8rem' }} onClick={() => handleApply(task.id)}>
+                                                    Apply
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Earnings Summary */}
+                            <div className="dashboard-card">
+                                <div className="dashboard-card-header">
+                                    <h3><i className="fas fa-chart-line"></i> Earnings Summary</h3>
+                                </div>
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1.5rem' }}>
+                                    <div style={{ textAlign: 'center', padding: '1.5rem', background: 'rgba(255,255,255,0.03)', borderRadius: '12px' }}>
+                                        <h4 style={{ color: '#00C9A7', fontSize: '1.5rem', fontWeight: 800 }}>Rs. 45,000</h4>
+                                        <p style={{ color: '#8892b0', fontSize: '0.85rem' }}>This Month</p>
+                                    </div>
+                                    <div style={{ textAlign: 'center', padding: '1.5rem', background: 'rgba(255,255,255,0.03)', borderRadius: '12px' }}>
+                                        <h4 style={{ color: '#FFD700', fontSize: '1.5rem', fontWeight: 800 }}>Rs. 180,000</h4>
+                                        <p style={{ color: '#8892b0', fontSize: '0.85rem' }}>Total Earned</p>
+                                    </div>
+                                    <div style={{ textAlign: 'center', padding: '1.5rem', background: 'rgba(255,255,255,0.03)', borderRadius: '12px' }}>
+                                        <h4 style={{ color: '#6495ED', fontSize: '1.5rem', fontWeight: 800 }}>Rs. 25,000</h4>
+                                        <p style={{ color: '#8892b0', fontSize: '0.85rem' }}>Pending</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </main>
+                    </div>
+                </div>
+            );
+        }
+
+        function BusinessDashboard({ navigate, addToast }) {
+            const [showForm, setShowForm] = useState(false);
+            const [postedTasks, setPostedTasks] = useState(POSTED_TASKS);
+            const [formData, setFormData] = useState({ title: '', description: '', budget: '', deadline: '', type: 'Content Creation' });
+            const [errors, setErrors] = useState({});
+
+            const validateForm = () => {
+                const newErrors = {};
+                if (!formData.title.trim()) newErrors.title = 'Title is required';
+                if (!formData.description.trim()) newErrors.description = 'Description is required';
+                if (!formData.budget.trim()) newErrors.budget = 'Budget is required';
+                if (!formData.deadline.trim()) newErrors.deadline = 'Deadline is required';
+                setErrors(newErrors);
+                return Object.keys(newErrors).length === 0;
+            };
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                if (validateForm()) {
+                    const newTask = {
+                        id: Date.now(),
+                        title: formData.title,
+                        desc: formData.description,
+                        price: formData.budget,
+                        deadline: formData.deadline,
+                        status: 'open',
+                        applicants: 0
+                    };
+                    setPostedTasks([newTask, ...postedTasks]);
+                    setShowForm(false);
+                    setFormData({ title: '', description: '', budget: '', deadline: '', type: 'Content Creation' });
+                    addToast('Task posted successfully!', 'success');
+                }
+            };
+
+            return (
+                <div className="dashboard">
+                    <div className="dashboard-header">
+                        <div className="dashboard-header-inner">
+                            <h1 className="dashboard-title"><i className="fas fa-building"></i> Business Dashboard</h1>
+                            <div className="dashboard-actions">
+                                <button className="btn btn-primary" onClick={() => setShowForm(true)}>
+                                    <i className="fas fa-plus"></i> Post New Task
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="dashboard-body">
+                        <aside className="dashboard-sidebar">
+                            <div className="dashboard-profile">
+                                <div className="dashboard-avatar" style={{ background: '#FFD700', color: '#0A192F' }}>TF</div>
+                                <h3>TechFlow Pvt Ltd</h3>
+                                <p>Software Company</p>
+                            </div>
+                            <ul className="dashboard-menu">
+                                <li><a href="#" className="active" onClick={(e) => e.preventDefault()}><i className="fas fa-tasks"></i> My Tasks</a></li>
+                                <li><a href="#" onClick={(e) => e.preventDefault()}><i className="fas fa-users"></i> Applicants</a></li>
+                                <li><a href="#" onClick={(e) => e.preventDefault()}><i className="fas fa-chart-bar"></i> Analytics</a></li>
+                                <li><a href="#" onClick={(e) => e.preventDefault()}><i className="fas fa-cog"></i> Settings</a></li>
+                                <li><a href="#" onClick={(e) => { e.preventDefault(); navigate('home'); }}><i className="fas fa-sign-out-alt"></i> Logout</a></li>
+                            </ul>
+                        </aside>
+                        <main className="dashboard-main">
+                            <div className="stats-grid">
+                                <div className="stat-card">
+                                    <div className="stat-card-icon green"><i className="fas fa-tasks"></i></div>
+                                    <h4>{postedTasks.length}</h4>
+                                    <p>Active Tasks</p>
+                                </div>
+                                <div className="stat-card">
+                                    <div className="stat-card-icon blue"><i className="fas fa-users"></i></div>
+                                    <h4>8</h4>
+                                    <p>Total Applicants</p>
+                                </div>
+                                <div className="stat-card">
+                                    <div className="stat-card-icon gold"><i className="fas fa-check-circle"></i></div>
+                                    <h4>5</h4>
+                                    <p>Completed</p>
+                                </div>
+                            </div>
+
+                            <div className="dashboard-card">
+                                <div className="dashboard-card-header">
+                                    <h3><i className="fas fa-list"></i> Posted Tasks</h3>
+                                    <button className="btn btn-primary" style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }} onClick={() => setShowForm(true)}>
+                                        <i className="fas fa-plus"></i> Post Task
+                                    </button>
+                                </div>
+                                <div className="task-list">
+                                    {postedTasks.map(task => (
+                                        <div key={task.id} className="task-item">
+                                            <div className="task-info">
+                                                <h4>{task.title}</h4>
+                                                <p>{task.desc} • {task.applicants !== undefined ? `${task.applicants} applicants` : ''}</p>
+                                            </div>
+                                            <div className="task-meta">
+                                                <span className="task-price">{task.price}</span>
+                                                <span className="task-deadline"><i className="fas fa-clock"></i> {task.deadline}</span>
+                                                <span className={`task-status ${task.status}`}>{task.status}</span>
+                                                <button className="btn btn-outline" style={{ padding: '0.4rem 1rem', fontSize: '0.8rem' }}>
+                                                    View
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </main>
+                    </div>
+
+                    {/* Post Task Modal */}
+                    {showForm && (
+                        <div className="modal-overlay open" onClick={(e) => { if (e.target === e.currentTarget) setShowForm(false); }}>
+                            <div className="modal-content">
+                                <div className="modal-header">
+                                    <h3><i className="fas fa-plus-circle"></i> Post a New Task</h3>
+                                    <button className="modal-close" onClick={() => setShowForm(false)}><i className="fas fa-times"></i></button>
+                                </div>
+                                <form onSubmit={handleSubmit}>
+                                    <div className="form-group">
+                                        <label>Task Title</label>
+                                        <input type="text" className="form-control" placeholder="e.g., AI Social Media Content"
+                                            value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} />
+                                        {errors.title && <div className="form-error">{errors.title}</div>}
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Description</label>
+                                        <textarea className="form-control" placeholder="Describe the task requirements..."
+                                            value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})}></textarea>
+                                        {errors.description && <div className="form-error">{errors.description}</div>}
+                                    </div>
+                                    <div className="form-row">
+                                        <div className="form-group">
+                                            <label>Budget (LKR)</label>
+                                            <input type="text" className="form-control" placeholder="e.g., Rs. 15,000"
+                                                value={formData.budget} onChange={e => setFormData({...formData, budget: e.target.value})} />
+                                            {errors.budget && <div className="form-error">{errors.budget}</div>}
+                                        </div>
+                                        <div className="form-group">
+                                            <label>Deadline</label>
+                                            <input type="text" className="form-control" placeholder="e.g., 5 days"
+                                                value={formData.deadline} onChange={e => setFormData({...formData, deadline: e.target.value})} />
+                                            {errors.deadline && <div className="form-error">{errors.deadline}</div>}
+                                        </div>
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Task Type</label>
+                                        <select className="form-control" value={formData.type} onChange={e => setFormData({...formData, type: e.target.value})}>
+                                            <option>Content Creation</option>
+                                            <option>AI Development</option>
+                                            <option>Copywriting</option>
+                                            <option>Data Science</option>
+                                            <option>Video Editing</option>
+                                            <option>Research</option>
+                                        </select>
+                                    </div>
+                                    <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>
+                                        <i className="fas fa-paper-plane"></i> Post Task
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        function MarketplacePage({ navigate, addToast }) {
+            const [filter, setFilter] = useState('all');
+            const [tasks] = useState(TASKS);
+
+            const filteredTasks = filter === 'all' ? tasks : tasks.filter(t => t.type.toLowerCase().includes(filter.toLowerCase()));
+
+            const filters = ['all', 'Content Creation', 'AI Development', 'Copywriting', 'Data Science', 'Video Editing', 'Research'];
+
+            const handleApply = (taskId) => {
+                addToast('Application submitted successfully!', 'success');
+            };
+
+            return (
+                <div style={{ paddingTop: '80px', minHeight: '100vh' }}>
+                    <section className="section">
+                        <div className="section-header animate-on-scroll">
+                            <div className="section-label">Marketplace</div>
+                            <h2 className="section-title">Browse Available Tasks</h2>
+                            <p className="section-desc">Find AI and digital marketing tasks that match your skills. Apply with one click.</p>
+                        </div>
+                        <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 2rem' }}>
+                            <div className="marketplace-filters animate-on-scroll">
+                                {filters.map(f => (
+                                    <button key={f} className={`filter-btn ${filter === f ? 'active' : ''}`} onClick={() => setFilter(f)}>
+                                        {f === 'all' ? 'All Tasks' : f}
+                                    </button>
+                                ))}
+                            </div>
+                            <div className="marketplace-grid">
+                                {filteredTasks.map((task, i) => (
+                                    <div key={task.id} className={`marketplace-card animate-on-scroll delay-${(i % 3) + 1}`}>
+                                        <div className="marketplace-card-header">
+                                            <span className="marketplace-card-type">{task.type}</span>
+                                            <span className="marketplace-card-price">{task.price}</span>
+                                        </div>
+                                        <h3>{task.title}</h3>
+                                        <p>{task.desc}</p>
+                                        <div className="marketplace-card-footer">
+                                            <div className="marketplace-card-meta">
+                                                <span><i className="fas fa-clock"></i> {task.deadline}</span>
+                                                <span><i className="fas fa-user"></i> 3-5 applicants</span>
+                                            </div>
+                                            <button className="btn btn-primary" style={{ padding: '0.5rem 1.2rem', fontSize: '0.85rem' }} onClick={() => handleApply(task.id)}>
+                                                Apply
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            );
+        }
+
+        function AboutPage() {
+            useScrollAnimation();
+            return (
+                <div style={{ paddingTop: '80px' }}>
+                    <section className="about-hero">
+                        <div className="section-header animate-on-scroll">
+                            <div className="section-label">About Us</div>
+                            <h1>Our Mission</h1>
+                            <p>Bridging the gap between university education and real-world AI skills. We believe every student deserves the opportunity to learn, earn, and build a future-proof career.</p>
+                        </div>
+                    </section>
+
+                    <section className="section">
+                        <div className="about-grid">
+                            <div className="about-image animate-on-scroll">
+                                <i className="fas fa-lightbulb about-image-icon"></i>
+                            </div>
+                            <div className="about-content animate-on-scroll delay-2">
+                                <h2>The Problem We Solve</h2>
+                                <p>Sri Lankan university students graduate with theoretical knowledge but lack practical AI and digital marketing skills. Meanwhile, businesses struggle to find affordable, skilled talent for AI-powered tasks.</p>
+                                <p>Students need income. Businesses need talent. There's a massive gap — and UniAI Hub bridges it.</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section className="section" style={{ background: 'rgba(10, 25, 47, 0.5)' }}>
+                        <div className="about-grid">
+                            <div className="about-content animate-on-scroll">
+                                <h2>Our Solution</h2>
+                                <p>UniAI Hub is a dual-sided platform that trains university students in high-demand AI skills and connects them directly with businesses that need AI-powered work done.</p>
+                                <p>We provide free AI training, a verified student marketplace, portfolio building, and instant payments — all in one place.</p>
+                            </div>
+                            <div className="about-image animate-on-scroll delay-2">
+                                <i className="fas fa-rocket about-image-icon"></i>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section className="section">
+                        <div className="about-grid">
+                            <div className="about-image animate-on-scroll">
+                                <i className="fas fa-eye about-image-icon"></i>
+                            </div>
+                            <div className="about-content animate-on-scroll delay-2">
+                                <h2>Our Vision</h2>
+                                <p>To make Sri Lanka a hub for AI talent by empowering every university student with practical skills and income opportunities. We envision a future where no student graduates without real-world experience.</p>
+                                <p>By 2030, we aim to have 100,000 students trained and earning through our platform, positioning Sri Lanka as a leader in AI workforce development.</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* Stats Section */}
+                    <section className="section" style={{ background: 'rgba(10, 25, 47, 0.5)' }}>
+                        <div className="section-header animate-on-scroll">
+                            <div className="section-label">Impact</div>
+                            <h2 className="section-title">Making a Difference</h2>
+                        </div>
+                        <div className="stats-grid" style={{ maxWidth: '1000px', margin: '0 auto', padding: '0 2rem' }}>
+                            <div className="stat-card animate-on-scroll">
+                                <div className="stat-card-icon green"><i className="fas fa-user-graduate"></i></div>
+                                <h4>5,000+</h4>
+                                <p>Students Registered</p>
+                            </div>
+                            <div className="stat-card animate-on-scroll delay-1">
+                                <div className="stat-card-icon blue"><i className="fas fa-building"></i></div>
+                                <h4>250+</h4>
+                                <p>Business Partners</p>
+                            </div>
+                            <div className="stat-card animate-on-scroll delay-2">
+                                <div className="stat-card-icon gold"><i className="fas fa-tasks"></i></div>
+                                <h4>3,500+</h4>
+                                <p>Tasks Completed</p>
+                            </div>
+                            <div className="stat-card animate-on-scroll delay-3">
+                                <div className="stat-card-icon green"><i className="fas fa-money-bill-wave"></i></div>
+                                <h4>Rs. 50M+</h4>
+                                <p>Paid to Students</p>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            );
+        }
+
+        function ContactPage({ addToast }) {
+            const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
+            const [errors, setErrors] = useState({});
+
+            const validate = () => {
+                const e = {};
+                if (!formData.name.trim()) e.name = 'Name is required';
+                if (!formData.email.trim()) e.email = 'Email is required';
+                else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) e.email = 'Invalid email';
+                if (!formData.subject.trim()) e.subject = 'Subject is required';
+                if (!formData.message.trim()) e.message = 'Message is required';
+                setErrors(e);
+                return Object.keys(e).length === 0;
+            };
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                if (validate()) {
+                    addToast('Message sent successfully! We will get back to you soon.', 'success');
+                    setFormData({ name: '', email: '', subject: '', message: '' });
+                }
+            };
+
+            return (
+                <div style={{ paddingTop: '80px', minHeight: '100vh' }}>
+                    <section className="section">
+                        <div className="section-header animate-on-scroll">
+                            <div className="section-label">Contact</div>
+                            <h2 className="section-title">Get In Touch</h2>
+                            <p className="section-desc">Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.</p>
+                        </div>
+                        <div className="contact-grid">
+                            <div className="contact-info animate-on-scroll">
+                                <h2>Let's Talk</h2>
+                                <p>Whether you're a student, business, or university partner — we're here to help you succeed in the AI economy.</p>
+                                <div className="contact-details">
+                                    <div className="contact-item">
+                                        <div className="contact-item-icon"><i className="fas fa-envelope"></i></div>
+                                        <div className="contact-item-info">
+                                            <h4>Email</h4>
+                                            <p>hello@unaihub.lk</p>
+                                        </div>
+                                    </div>
+                                    <div className="contact-item">
+                                        <div className="contact-item-icon"><i className="fas fa-phone"></i></div>
+                                        <div className="contact-item-info">
+                                            <h4>Phone</h4>
+                                            <p>+94 76 123 4567</p>
+                                        </div>
+                                    </div>
+                                    <div className="contact-item">
+                                        <div className="contact-item-icon"><i className="fas fa-map-marker-alt"></i></div>
+                                        <div className="contact-item-info">
+                                            <h4>Location</h4>
+                                            <p>Colombo, Sri Lanka</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="social-links">
+                                    <a href="#" className="social-link"><i className="fab fa-facebook-f"></i></a>
+                                    <a href="#" className="social-link"><i className="fab fa-twitter"></i></a>
+                                    <a href="#" className="social-link"><i className="fab fa-linkedin-in"></i></a>
+                                    <a href="#" className="social-link"><i className="fab fa-instagram"></i></a>
+                                    <a href="#" className="social-link"><i className="fab fa-youtube"></i></a>
+                                </div>
+                            </div>
+                            <div className="animate-on-scroll delay-2">
+                                <div className="dashboard-card">
+                                    <form onSubmit={handleSubmit}>
+                                        <div className="form-group">
+                                            <label>Your Name</label>
+                                            <input type="text" className="form-control" placeholder="John Doe"
+                                                value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
+                                            {errors.name && <div className="form-error">{errors.name}</div>}
+                                        </div>
+                                        <div className="form-group">
+                                            <label>Email Address</label>
+                                            <input type="email" className="form-control" placeholder="john@university.lk"
+                                                value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
+                                            {errors.email && <div className="form-error">{errors.email}</div>}
+                                        </div>
+                                        <div className="form-group">
+                                            <label>Subject</label>
+                                            <input type="text" className="form-control" placeholder="How can we help?"
+                                                value={formData.subject} onChange={e => setFormData({...formData, subject: e.target.value})} />
+                                            {errors.subject && <div className="form-error">{errors.subject}</div>}
+                                        </div>
+                                        <div className="form-group">
+                                            <label>Message</label>
+                                            <textarea className="form-control" placeholder="Tell us more..."
+                                                value={formData.message} onChange={e => setFormData({...formData, message: e.target.value})}></textarea>
+                                            {errors.message && <div className="form-error">{errors.message}</div>}
+                                        </div>
+                                        <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>
+                                            <i className="fas fa-paper-plane"></i> Send Message
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            );
+        }
+
+        function LoginPage({ navigate, addToast }) {
+            const [formData, setFormData] = useState({ email: '', password: '' });
+            const [errors, setErrors] = useState({});
+
+            const validate = () => {
+                const e = {};
+                if (!formData.email.trim()) e.email = 'Email is required';
+                if (!formData.password.trim()) e.password = 'Password is required';
+                setErrors(e);
+                return Object.keys(e).length === 0;
+            };
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                if (validate()) {
+                    addToast('Login successful! Welcome back.', 'success');
+                    setTimeout(() => navigate('student-dashboard'), 1000);
+                }
+            };
+
+            return (
+                <div className="auth-page">
+                    <div className="auth-bg"></div>
+                    <div className="auth-container">
+                        <div className="auth-header">
+                            <a href="#" className="logo" onClick={(e) => { e.preventDefault(); navigate('home'); }}>
+                                <div className="logo-icon"><i className="fas fa-graduation-cap"></i></div>
+                                UniAI Hub
+                            </a>
+                            <h2>Welcome Back</h2>
+                            <p>Sign in to your account to continue</p>
+                        </div>
+                        <form onSubmit={handleSubmit}>
+                            <div className="form-group">
+                                <label>Email Address</label>
+                                <input type="email" className="form-control" placeholder="you@university.lk"
+                                    value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
+                                {errors.email && <div className="form-error">{errors.email}</div>}
+                            </div>
+                            <div className="form-group">
+                                <label>Password</label>
+                                <input type="password" className="form-control" placeholder="••••••••"
+                                    value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} />
+                                {errors.password && <div className="form-error">{errors.password}</div>}
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#8892b0', fontSize: '0.85rem', cursor: 'pointer' }}>
+                                    <input type="checkbox" style={{ accentColor: '#00C9A7' }} /> Remember me
+                                </label>
+                                <a href="#" style={{ color: '#00C9A7', fontSize: '0.85rem', textDecoration: 'none' }}>Forgot password?</a>
+                            </div>
+                            <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>
+                                <i className="fas fa-sign-in-alt"></i> Sign In
+                            </button>
+                        </form>
+                        <div className="auth-footer">
+                            Don't have an account? <a href="#" onClick={(e) => { e.preventDefault(); navigate('register'); }}>Sign up</a>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        function RegisterPage({ navigate, addToast }) {
+            const [userType, setUserType] = useState('student');
+            const [formData, setFormData] = useState({
+                name: '',
+                email: '',
+                university: '',
+                password: '',
+                confirmPassword: ''
+            });
+            const [errors, setErrors] = useState({});
+
+            const validate = () => {
+                const e = {};
+                if (!formData.name.trim()) e.name = 'Name is required';
+                if (!formData.email.trim()) e.email = 'Email is required';
+                else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) e.email = 'Invalid email';
+                if (userType === 'student' && !formData.university.trim()) e.university = 'University is required';
+                if (!formData.password.trim()) e.password = 'Password is required';
+                else if (formData.password.length < 6) e.password = 'Password must be at least 6 characters';
+                if (formData.password !== formData.confirmPassword) e.confirmPassword = 'Passwords do not match';
+                setErrors(e);
+                return Object.keys(e).length === 0;
+            };
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                if (validate()) {
+                    addToast('Account created successfully! Welcome to UniAI Hub.', 'success');
+                    setTimeout(() => navigate(userType === 'student' ? 'student-dashboard' : 'business-dashboard'), 1000);
+                }
+            };
+
+            return (
+                <div className="auth-page">
+                    <div className="auth-bg"></div>
+                    <div className="auth-container">
+                        <div className="auth-header">
+                            <a href="#" className="logo" onClick={(e) => { e.preventDefault(); navigate('home'); }}>
+                                <div className="logo-icon"><i className="fas fa-graduation-cap"></i></div>
+                                UniAI Hub
+                            </a>
+                            <h2>Create Account</h2>
+                            <p>Join Sri Lanka's AI earning revolution</p>
+                        </div>
+                        <div className="auth-tabs">
+                            <button className={`auth-tab ${userType === 'student' ? 'active' : ''}`} onClick={() => setUserType('student')}>
+                                <i className="fas fa-user-graduate"></i> Student
+                            </button>
+                            <button className={`auth-tab ${userType === 'business' ? 'active' : ''}`} onClick={() => setUserType('business')}>
+                                <i className="fas fa-building"></i> Business
+                            </button>
+                        </div>
+                        <form onSubmit={handleSubmit}>
+                            <div className="form-group">
+                                <label>Full Name</label>
+                                <input type="text" className="form-control" placeholder="Your full name"
+                                    value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
+                                {errors.name && <div className="form-error">{errors.name}</div>}
+                            </div>
+                            <div className="form-group">
+                                <label>Email Address</label>
+                                <input type="email" className="form-control" placeholder={userType === 'student' ? 'you@university.lk' : 'you@company.com'}
+                                    value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
+                                {errors.email && <div className="form-error">{errors.email}</div>}
+                            </div>
+                            {userType === 'student' && (
+                                <div className="form-group">
+                                    <label>University</label>
+                                    <select className="form-control" value={formData.university} onChange={e => setFormData({...formData, university: e.target.value})}>
+                                        <option value="">Select your university</option>
+                                        <option>University of Colombo</option>
+                                        <option>University of Peradeniya</option>
+                                        <option>University of Moratuwa</option>
+                                        <option>University of Kelaniya</option>
+                                        <option>University of Sri Jayewardenepura</option>
+                                        <option>University of Ruhuna</option>
+                                        <option>University of Jaffna</option>
+                                        <option>Other</option>
+                                    </select>
+                                    {errors.university && <div className="form-error">{errors.university}</div>}
+                                </div>
+                            )}
+                            <div className="form-group">
+                                <label>Password</label>
+                                <input type="password" className="form-control" placeholder="Create a password"
+                                    value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} />
+                                {errors.password && <div className="form-error">{errors.password}</div>}
+                            </div>
+                            <div className="form-group">
+                                <label>Confirm Password</label>
+                                <input type="password" className="form-control" placeholder="Confirm your password"
+                                    value={formData.confirmPassword} onChange={e => setFormData({...formData, confirmPassword: e.target.value})} />
+                                {errors.confirmPassword && <div className="form-error">{errors.confirmPassword}</div>}
+                            </div>
+                            <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>
+                                <i className="fas fa-user-plus"></i> Create Account
+                            </button>
+                        </form>
+                        <div className="auth-footer">
+                            Already have an account? <a href="#" onClick={(e) => { e.preventDefault(); navigate('login'); }}>Sign in</a>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        const { useState, useEffect, useRef } = React;
+
+        // ===================== DATA =====================
+        const FEATURES = [
+            {
+                icon: 'fa-brain',
+                title: 'AI Skill Training',
+                desc: 'Master cutting-edge AI tools like ChatGPT, Midjourney, and Canva AI through hands-on courses designed for university students.'
+            },
+            {
+                icon: 'fa-briefcase',
+                title: 'Micro Task Marketplace',
+                desc: 'Browse and complete real tasks from businesses — content creation, social media, data labeling, and more.'
+            },
+            {
+                icon: 'fa-shield-halved',
+                title: 'Verified Student System',
+                desc: 'Every student is verified with a university email. Businesses get trusted talent, students get real opportunities.'
+            },
+            {
+                icon: 'fa-folder-open',
+                title: 'Portfolio Builder',
+                desc: 'Automatically build a professional portfolio as you complete tasks. Showcase your skills to future employers.'
+            }
+        ];
+
+        const STEPS_STUDENT = [
+            {
+                num: '01',
+                title: 'Sign Up & Verify',
+                desc: 'Register with your university email. Get verified instantly and unlock the platform.'
+            },
+            {
+                num: '02',
+                title: 'Learn AI Skills',
+                desc: 'Complete free AI training modules. Earn badges and certificates as you progress.'
+            },
+            {
+                num: '03',
+                title: 'Complete Tasks & Earn',
+                desc: 'Browse tasks, apply with one click, deliver quality work, and get paid directly.'
+            }
+        ];
+
+        const STEPS_BUSINESS = [
+            {
+                num: '01',
+                title: 'Post a Task',
+                desc: 'Describe your project, set a budget, and choose the skills you need.'
+            },
+            {
+                num: '02',
+                title: 'Review Applicants',
+                desc: 'Browse verified student profiles, portfolios, and skill badges to find the perfect match.'
+            },
+            {
+                num: '03',
+                title: 'Get Results',
+                desc: 'Receive high-quality AI-powered work from talented university students.'
+            }
+        ];
+
+        const TESTIMONIALS = [
+            {
+                text: "UniAI Hub changed my university life. I learned AI skills and earned enough to cover my semester fees. The tasks are real and the community is amazing!",
+                name: "Sarah Perera",
+                role: "Computer Science, University of Colombo",
+                rating: 5,
+                initial: "SP"
+            },
+            {
+                text: "As a startup founder, I needed affordable AI talent. UniAI Hub delivered incredible results — students are skilled, fast, and genuinely passionate.",
+                name: "Dinesh Fernando",
+                role: "CEO, TechStart LK",
+                rating: 5,
+                initial: "DF"
+            },
+            {
+                text: "The portfolio builder is a game-changer. I landed my first internship because I could show real work I did through UniAI Hub.",
+                name: "Amaya Silva",
+                role: "Marketing, University of Peradeniya",
+                rating: 5,
+                initial: "AS"
+            }
+        ];
+
+        const TASKS = [
+            {
+                id: 1,
+                title: "AI-Generated Social Media Content",
+                desc: "Create 30 Instagram posts using AI tools for a local fashion brand. Include captions and hashtags.",
+                price: "Rs. 15,000",
+                deadline: "5 days",
+                type: "Content Creation",
+                status: "open"
+            },
+            {
+                id: 2,
+                title: "Chatbot Setup for E-commerce",
+                desc: "Build and configure a customer service chatbot using ChatGPT API for an online store.",
+                price: "Rs. 25,000",
+                deadline: "7 days",
+                type: "AI Development",
+                status: "open"
+            },
+            {
+                id: 3,
+                title: "AI Product Descriptions",
+                desc: "Write SEO-optimized product descriptions for 50 items using AI writing tools.",
+                price: "Rs. 10,000",
+                deadline: "3 days",
+                type: "Copywriting",
+                status: "open"
+            },
+            {
+                id: 4,
+                title: "Data Labeling for ML Model",
+                desc: "Label 500 images for a computer vision project. Training provided.",
+                price: "Rs. 8,000",
+                deadline: "4 days",
+                type: "Data Science",
+                status: "open"
+            },
+            {
+                id: 5,
+                title: "AI Video Editing",
+                desc: "Edit and enhance 5 promotional videos using AI video tools like Runway ML.",
+                price: "Rs. 20,000",
+                deadline: "6 days",
+                type: "Video Editing",
+                status: "open"
+            },
+            {
+                id: 6,
+                title: "AI Market Research Report",
+                desc: "Compile a comprehensive market research report using AI data analysis tools.",
+                price: "Rs. 18,000",
+                deadline: "5 days",
+                type: "Research",
+                status: "open"
+            }
+        ];
+
+        const POSTED_TASKS = [
+            {
+                id: 101,
+                title: "Logo Design with AI",
+                desc: "Create a modern logo using AI design tools",
+                price: "Rs. 12,000",
+                deadline: "3 days",
+                status: "in-progress",
+                applicants: 5
+            },
+            {
+                id: 102,
+                title: "Email Marketing Campaign",
+                desc: "Design AI-powered email sequences",
+                price: "Rs. 20,000",
+                deadline: "5 days",
+                status: "open",
+                applicants: 3
+            }
+        ];
+
+        // ===================== HOOKS =====================
+        function useScrollAnimation() {
+            useEffect(() => {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('visible');
+                        }
+                    });
+                }, { threshold: 0.1 });
+
+                document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
+                return () => observer.disconnect();
+            }, []);
+        }
+
+        function useScrollNav() {
+            const [scrolled, setScrolled] = useState(false);
+            useEffect(() => {
+                const handleScroll = () => setScrolled(window.scrollY > 50);
+                window.addEventListener('scroll', handleScroll);
+                return () => window.removeEventListener('scroll', handleScroll);
+            }, []);
+            return scrolled;
+        }
+
+        // ===================== COMPONENTS =====================
+        function Navbar({ currentPage, navigate }) {
+            const scrolled = useScrollNav();
+            const [mobileOpen, setMobileOpen] = useState(false);
+
+            const navItems = [
+                { label: 'Home', page: 'home' },
+                { label: 'Marketplace', page: 'marketplace' },
+                { label: 'About', page: 'about' },
+                { label: 'Contact', page: 'contact' }
+            ];
+
+            return (
+                <>
+                    <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
+                        <div className="navbar-inner">
+                            <a href="#" className="logo" onClick={(e) => { e.preventDefault(); navigate('home'); }}>
+                                <div className="logo-icon"><i className="fas fa-graduation-cap"></i></div>
+                                UniAI Hub
+                            </a>
+                            <ul className="nav-links">
+                                {navItems.map(item => (
+                                    <li key={item.page}>
+                                        <a href="#" onClick={(e) => { e.preventDefault(); navigate(item.page); }}
+                                           style={{ color: currentPage === item.page ? '#00C9A7' : '' }}>
+                                            {item.label}
+                                        </a>
+                                    </li>
+                                ))}
+                                <li><a href="#" className="nav-cta" onClick={(e) => { e.preventDefault(); navigate('register'); }}>Get Started</a></li>
+                            </ul>
+                            <button className="mobile-toggle" onClick={() => setMobileOpen(true)}>
+                                <i className="fas fa-bars"></i>
+                            </button>
+                        </div>
+                    </nav>
+                    <div className={`mobile-menu-overlay ${mobileOpen ? 'open' : ''}`} onClick={() => setMobileOpen(false)}></div>
+                    <div className={`mobile-menu ${mobileOpen ? 'open' : ''}`}>
+                        <button className="mobile-menu-close" onClick={() => setMobileOpen(false)}>
+                            <i className="fas fa-times"></i>
+                        </button>
+                        <ul>
+                            {navItems.map(item => (
+                                <li key={item.page}>
+                                    <a href="#" onClick={(e) => { e.preventDefault(); navigate(item.page); setMobileOpen(false); }}>
+                                        {item.label}
+                                    </a>
+                                </li>
+                            ))}
+                            <li><a href="#" onClick={(e) => { e.preventDefault(); navigate('register'); setMobileOpen(false); }}>Get Started</a></li>
+                            <li><a href="#" onClick={(e) => { e.preventDefault(); navigate('login'); setMobileOpen(false); }}>Login</a></li>
+                        </ul>
+                    </div>
+                </>
+            );
+        }
+
+        function Footer({ navigate }) {
+            return (
+                <footer className="footer">
+                    <div className="footer-grid">
+                        <div className="footer-brand">
+                            <a href="#" className="logo" onClick={(e) => { e.preventDefault(); navigate('home'); }}>
+                                <div className="logo-icon"><i className="fas fa-graduation-cap"></i></div>
+                                UniAI Hub
+                            </a>
+                            <p>Sri Lanka's first university-only AI earning platform. Empowering students with AI skills and real income opportunities.</p>
+                        </div>
+                        <div className="footer-links">
+                            <h4>Platform</h4>
+                            <ul>
+                                <li><a href="#" onClick={(e) => { e.preventDefault(); navigate('marketplace'); }}>Marketplace</a></li>
+                                <li><a href="#" onClick={(e) => { e.preventDefault(); navigate('student-dashboard'); }}>Student Dashboard</a></li>
+                                <li><a href="#" onClick={(e) => { e.preventDefault(); navigate('business-dashboard'); }}>Business Dashboard</a></li>
+                            </ul>
+                        </div>
+                        <div className="footer-links">
+                            <h4>Company</h4>
+                            <ul>
+                                <li><a href="#" onClick={(e) => { e.preventDefault(); navigate('about'); }}>About Us</a></li>
+                                <li><a href="#" onClick={(e) => { e.preventDefault(); navigate('contact'); }}>Contact</a></li>
+                                <li><a href="#">Careers</a></li>
+                            </ul>
+                        </div>
+                        <div className="footer-links">
+                            <h4>Legal</h4>
+                            <ul>
+                                <li><a href="#">Privacy Policy</a></li>
+                                <li><a href="#">Terms of Service</a></li>
+                                <li><a href="#">Cookie Policy</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div className="footer-bottom">
+                        <p>© 2026 UniAI Hub. All rights reserved.</p>
+                        <p>Made with <i className="fas fa-heart" style={{color: '#00C9A7'}}></i> in Sri Lanka</p>
+                    </div>
+                </footer>
+            );
+        }
+
+        function Toast({ message, type, onClose }) {
+            useEffect(() => {
+                const timer = setTimeout(onClose, 3000);
+                return () => clearTimeout(timer);
+            }, [onClose]);
+
+            return (
+                <div className={`toast ${type}`}>
+                    <i className={`fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}`}></i>
+                    {message}
+                </div>
+            );
+        }
+
+        function ToastContainer({ toasts, removeToast }) {
+            return (
+                <div className="toast-container">
+                    {toasts.map(t => (
+                        <Toast key={t.id} message={t.message} type={t.type} onClose={() => removeToast(t.id)} />
+                    ))}
+                </div>
+            );
+        }
+
+        // ===================== PAGES =====================
+        function HomePage({ navigate, addToast }) {
+            useScrollAnimation();
+            const [activeTab, setActiveTab] = useState('student');
+
+            const particles = Array.from({ length: 20 }, (_, i) => ({
+                id: i,
+                left: `${Math.random() * 100}%`,
+                delay: `${Math.random() * 15}s`,
+                duration: `${10 + Math.random() * 10}s`
+            }));
+
+            return (
+                <>
+                    {/* Hero Section */}
+                    <section className="hero">
+                        <div className="hero-bg">
+                            <div className="hero-grid"></div>
+                            <div className="hero-glow"></div>
+                            <div className="hero-particles">
+                                {particles.map(p => (
+                                    <div key={p.id} className="particle" style={{
+                                        left: p.left,
+                                        animationDelay: p.delay,
+                                        animationDuration: p.duration
+                                    }}></div>
+                                ))}
+                            </div>
+                        </div>
+                        <div className="hero-content">
+                            <div className="hero-text">
+                                <h1 style={{ animation: 'fadeInUp 0.8s ease forwards' }}>
+                                    Learn <span>AI</span>. Earn Money. Grow as a Student.
+                                </h1>
+                                <p className="hero-subtitle" style={{ animation: 'fadeInUp 0.8s ease 0.2s forwards', opacity: 0 }}>
+                                    Sri Lanka's first university-only AI earning platform. Master AI tools, complete real tasks, and build your future — all while studying.
+                                </p>
+                                <div className="hero-badges" style={{ animation: 'fadeInUp 0.8s ease 0.4s forwards', opacity: 0 }}>
+                                    <div className="hero-badge"><i className="fas fa-check"></i> Free to Join</div>
+                                    <div className="hero-badge"><i className="fas fa-check"></i> University Verified</div>
+                                    <div className="hero-badge"><i className="fas fa-check"></i> Instant Payouts</div>
+                                </div>
+                                <div className="hero-cta-group" style={{ animation: 'fadeInUp 0.8s ease 0.6s forwards', opacity: 0 }}>
+                                    <button className="btn btn-primary" onClick={() => navigate('register')}>
+                                        <i className="fas fa-user-graduate"></i> Join as Student
+                                    </button>
+                                    <button className="btn btn-outline" onClick={() => navigate('business-dashboard')}>
+                                        <i className="fas fa-building"></i> Hire Students
+                                    </button>
+                                </div>
+                            </div>
+                            <div className="hero-visual" style={{ animation: 'fadeIn 1s ease 0.5s forwards', opacity: 0 }}>
+                                <div className="hero-card">
+                                    <div className="hero-card-header">
+                                        <div className="hero-card-avatar">JD</div>
+                                        <div className="hero-card-info">
+                                            <h4>Janith De Silva</h4>
+                                            <p>Computer Science, UOM</p>
+                                        </div>
+                                    </div>
+                                    <div className="hero-card-badge">AI Pro Badge</div>
+                                    <div className="hero-card-task">
+                                        <div className="hero-card-task-info">
+                                            <h5>Social Media AI Content</h5>
+                                            <p>Due in 3 days</p>
+                                        </div>
+                                        <div className="hero-card-price">Rs. 15K</div>
+                                    </div>
+                                    <div className="hero-card-task">
+                                        <div className="hero-card-task-info">
+                                            <h5>Chatbot Configuration</h5>
+                                            <p>Due in 5 days</p>
+                                        </div>
+                                        <div className="hero-card-price">Rs. 25K</div>
+                                    </div>
+                                    <div className="hero-stats">
+                                        <div className="hero-stat">
+                                            <h3>12</h3>
+                                            <p>Tasks Done</p>
+                                        </div>
+                                        <div className="hero-stat">
+                                            <h3>Rs. 180K</h3>
+                                            <p>Earned</p>
+                                        </div>
+                                        <div className="hero-stat">
+                                            <h3>4.9</h3>
+                                            <p>Rating</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* Features Section */}
+                    <section className="section">
+                        <div className="section-header animate-on-scroll">
+                            <div className="section-label">Why UniAI Hub</div>
+                            <h2 className="section-title">Everything You Need to Succeed</h2>
+                            <p className="section-desc">A complete ecosystem designed for Sri Lankan university students to learn, earn, and grow.</p>
+                        </div>
+                        <div className="features-grid">
+                            {FEATURES.map((f, i) => (
+                                <div key={i} className={`feature-card animate-on-scroll delay-${i + 1}`}>
+                                    <div className="feature-icon"><i className={`fas ${f.icon}`}></i></div>
+                                    <h3>{f.title}</h3>
+                                    <p>{f.desc}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+
+                    {/* How It Works */}
+                    <section className="section how-it-works">
+                        <div className="section-header animate-on-scroll">
+                            <div className="section-label">How It Works</div>
+                            <h2 className="section-title">Get Started in Minutes</h2>
+                            <p className="section-desc">Whether you're a student looking to earn or a business seeking talent, we've made it simple.</p>
+                        </div>
+                        <div className="steps-container">
+                            <div className="steps-tabs animate-on-scroll">
+                                <button className={`step-tab ${activeTab === 'student' ? 'active' : ''}`} onClick={() => setActiveTab('student')}>
+                                    <i className="fas fa-user-graduate"></i> For Students
+                                </button>
+                                <button className={`step-tab ${activeTab === 'business' ? 'active' : ''}`} onClick={() => setActiveTab('business')}>
+                                    <i className="fas fa-building"></i> For Businesses
+                                </button>
+                            </div>
+                            <div className="steps-grid">
+                                {(activeTab === 'student' ? STEPS_STUDENT : STEPS_BUSINESS).map((step, i) => (
+                                    <div key={i} className={`step-card animate-on-scroll delay-${i + 1}`}>
+                                        <div className="step-number">{step.num}</div>
+                                        <h3>{step.title}</h3>
+                                        <p>{step.desc}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* Testimonials */}
+                    <section className="section">
+                        <div className="section-header animate-on-scroll">
+                            <div className="section-label">Testimonials</div>
+                            <h2 className="section-title">What Our Community Says</h2>
+                            <p className="section-desc">Join thousands of students and businesses already using UniAI Hub.</p>
+                        </div>
+                        <div className="testimonials-grid">
+                            {TESTIMONIALS.map((t, i) => (
+                                <div key={i} className={`testimonial-card animate-on-scroll delay-${i + 1}`}>
+                                    <div className="testimonial-stars">
+                                        {Array.from({ length: t.rating }, (_, j) => (
+                                            <i key={j} className="fas fa-star"></i>
+                                        ))}
+                                    </div>
+                                    <p className="testimonial-text">"{t.text}"</p>
+                                    <div className="testimonial-author">
+                                        <div className="testimonial-avatar">{t.initial}</div>
+                                        <div className="testimonial-info">
+                                            <h4>{t.name}</h4>
+                                            <p>{t.role}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+
+                    {/* CTA Banner */}
+                    <section className="cta-banner">
+                        <div className="cta-banner-bg"></div>
+                        <div className="cta-banner-content animate-on-scroll">
+                            <h2>Ready to Start Your AI Journey?</h2>
+                            <p>Join 5,000+ Sri Lankan university students already earning with AI skills.</p>
+                            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+                                <button className="btn btn-primary" onClick={() => navigate('register')}>
+                                    <i className="fas fa-rocket"></i> Join Free Today
+                                </button>
+                                <button className="btn btn-outline" onClick={() => navigate('marketplace')}>
+                                    <i className="fas fa-search"></i> Browse Tasks
+                                </button>
+                            </div>
+                        </div>
+                    </section>
+                </>
+            );
+        }
+
+        // ===================== MAIN APP =====================
+        function App() {
+            const [currentPage, setCurrentPage] = useState('home');
+            const [toasts, setToasts] = useState([]);
+
+            // Loading screen
+            useEffect(() => {
+                const timer = setTimeout(() => {
+                    document.getElementById('loading-screen').classList.add('hidden');
+                }, 2000);
+                return () => clearTimeout(timer);
+            }, []);
+
+            const navigate = (page) => {
+                setCurrentPage(page);
+                window.scrollTo(0, 0);
+            };
+
+            const addToast = (message, type = 'info') => {
+                const id = Date.now();
+                setToasts(prev => [...prev, { id, message, type }]);
+            };
+
+            const removeToast = (id) => {
+                setToasts(prev => prev.filter(t => t.id !== id));
+            };
+
+            const renderPage = () => {
+                switch (currentPage) {
+                    case 'home': return <HomePage navigate={navigate} addToast={addToast} />;
+                    case 'student-dashboard': return <StudentDashboard navigate={navigate} addToast={addToast} />;
+                    case 'business-dashboard': return <BusinessDashboard navigate={navigate} addToast={addToast} />;
+                    case 'marketplace': return <MarketplacePage navigate={navigate} addToast={addToast} />;
+                    case 'about': return <AboutPage />;
+                    case 'contact': return <ContactPage addToast={addToast} />;
+                    case 'login': return <LoginPage navigate={navigate} addToast={addToast} />;
+                    case 'register': return <RegisterPage navigate={navigate} addToast={addToast} />;
+                    default: return <HomePage navigate={navigate} addToast={addToast} />;
+                }
+            };
+
+            const showNavFooter = !['login', 'register', 'student-dashboard', 'business-dashboard'].includes(currentPage);
+
+            return (
+                <>
+                    {showNavFooter && <Navbar currentPage={currentPage} navigate={navigate} />}
+                    {renderPage()}
+                    {showNavFooter && <Footer navigate={navigate} />}
+                    <ToastContainer toasts={toasts} removeToast={removeToast} />
+                </>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
